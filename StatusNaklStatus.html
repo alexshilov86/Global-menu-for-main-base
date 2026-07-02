@@ -1,0 +1,162 @@
+<!doctype html> <!---Форма для нахождения статуса накладной ПЭК и СДЭК --->
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+    <title>Статус накладной</title>
+  </head>
+  <body>
+    
+    <div class="container">
+      <div>
+        <div>
+          <div class="input-group input-group-sm mb-3" style="margin-top:10px">
+            <div class="input-group-prepend">
+              <span class="input-group-text">Накладная</span>
+            </div>
+            <input type="text" class="form-control" id="nakl_number" style="width:50%">
+          </div>
+          <!--- <button  class="btn btn-primary" id="btn_show_row_in_table" style="width:45%">Показать строку</button>!--->
+          <nav aria-label="Page navigation example">
+            <ul class="pagination">
+              <li class="page-item"><a class="page-link" href="#" id="prevbtn">пред.</a></li>
+              <li class="page-item"><a class="page-link" href="#" id="btn_show_row_in_table">текущая строка</a></li>
+              <li class="page-item"><a class="page-link" href="#" id="nextbtn">след.</a></li>
+            </ul>
+          </nav>          
+          <button  class="btn btn-outline-primary" id="btn_nakl_status">Статус накладной</button>
+          <div class="input-group input-group-sm mb-3" style="margin-top:10px">
+            <div class="input-group-prepend">
+              <span class="input-group-text">статус:</span>
+            </div>
+            <input type="text" class="form-control" id="nakl_status">
+          </div>          
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <div class="input-group-text">
+                <input type="checkbox" aria-label="Checkbox for following text input" value = "true" id="insert_status">
+              </div>
+            </div>
+            <label for="insert_status" style="margin-left:10px"> Внести статус в базу</label>
+          </div>     
+          <div style="border-top-style: solid">    
+            <div class="input-group" style="margin-top:50px">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Строки:</span>
+              </div>
+              <input type="number" aria-label="First page" class="form-control" id="first_page">
+              <input type="number" aria-label="Last page" class="form-control " id="last_page">
+            </div>   
+            <button  class="btn btn-outline-primary" id="btn_all_statuses">Обновить статусы</button>        
+            <label for="all_nakl_statuses_log" id="all_nakl_statuses_log"></label>
+          </div>
+      </div>
+    </div>    
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <script>
+      let curRow = 2;
+      let columns = {};
+      let ws = "";
+      let btn_add = document.getElementById("btn_show_row_in_table");
+      btn_add.addEventListener("click", onButtonShowRowClick);
+      let btn_status = document.getElementById("btn_nakl_status");
+      btn_status.addEventListener("click", onButtonStatusClick);
+      let btn_all_statuses = document.getElementById("btn_all_statuses");
+      btn_all_statuses.addEventListener("click", onButtonAllStatusesClick);
+
+      
+      function onButtonShowRowClick(){
+        let nakl_elem = document.getElementById("nakl_number")
+        let data = {"nakl_number" : nakl_elem.value}
+
+        google.script.run.withSuccessHandler(SideBarLoadsWithData).ShowRowNakl(data);
+      }
+
+      let btn_next = document.getElementById("nextbtn");
+      btn_next.addEventListener("click", onButtonNextClick);
+      let btn_prev = document.getElementById("prevbtn");
+      btn_prev.addEventListener("click", onButtonPrevClick);
+
+      function onButtonNextClick() {
+        curRow = curRow + 1;
+        google.script.run.withSuccessHandler(UpDateForm).getDataFromTable(curRow, columns, "next");
+        let nakl_status = document.getElementById("nakl_status");
+        nakl_status.value = "";           
+      }
+      function UpDateCurRow(data) {
+        curRow = data;
+      }
+    
+      function onButtonPrevClick() {
+        curRow = curRow - 1;
+        google.script.run.withSuccessHandler(UpDateForm).getDataFromTable(curRow, columns, "prev");
+        let nakl_status = document.getElementById("nakl_status");
+        nakl_status.value = "";           
+      }
+
+      function SideBarLoads(){
+        google.script.run.withSuccessHandler(SideBarLoadsWithData).returnCurRowData();
+      }
+
+      function SideBarLoadsWithData(data) {
+        curRow = data[0];
+        columns = data[1];
+        google.script.run.withSuccessHandler(UpDateForm).getDataFromTable(curRow, columns);
+        let nakl_status = document.getElementById("nakl_status");
+        nakl_status.value = "";         
+      }
+      function UpDateForm(data) {
+        let nakl_elem = document.getElementById("nakl_number");
+        nakl_elem.value = data[0];
+        curRow = data[1];
+      }
+      function onButtonStatusClick(){
+        let nakl_elem = document.getElementById("nakl_number");
+        
+        google.script.run.withSuccessHandler(LoadStatusOnForm).getNaklStatus(nakl_elem.value, columns, curRow);
+      }
+      function LoadStatusOnForm(data) {
+        let nakl_status = document.getElementById("nakl_status");
+        let insert_status =  document.getElementById("insert_status");
+        if (data[0] == "доставлен") {
+          nakl_status.value = data[0];
+          if (insert_status.checked) {
+            google.script.run.addToTableDostavlen(curRow, columns, data);
+          }
+        } else if (data[0] == "") {
+            
+        } else {
+          let delivDatePlan = new Date(data[1]).toLocaleDateString();
+          if (delivDatePlan == "01.01.1970") delivDatePlan = "";
+          nakl_status.value = data[0] + " " + delivDatePlan;
+         
+          if (insert_status.checked) {
+            google.script.run.addToTableNeDostavlen(curRow, columns, data[0] + " " + delivDatePlan);
+          }
+        }
+      }
+      function onButtonAllStatusesClick() {
+        let first_page = document.getElementById("first_page").value;
+        let last_page = document.getElementById("last_page").value;
+        let all_nakl_statuses_log = document.getElementById("all_nakl_statuses_log");
+        all_nakl_statuses_log.textContent  = "";
+        google.script.run.withSuccessHandler(updateFormAfterAllStatusses).updateAllStatusses(first_page, last_page, columns);
+      }
+      function updateFormAfterAllStatusses(count) {
+        let all_nakl_statuses_log = document.getElementById("all_nakl_statuses_log");
+        all_nakl_statuses_log.textContent  = "Обновлено " + count + " накладных";
+      }
+
+      document.addEventListener("DOMContentLoaded", SideBarLoads);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+  </head>
+  <body>
+    <div>
+      <label id="has_access"></label>
+    </div>
+    <script>
+      function SideBarLoadsNoAccess() {
+        google.script.run.withSuccessHandler(NoAccessAddLabel).getUsernameForAcc();
+      }
+      function NoAccessAddLabel(data) {
+        let lbl = document.getElementById("has_access");
+        lbl.textContent = "У пользователя " + data + " " + "нет доступа";
+      }
+      document.addEventListener("DOMContentLoaded", SideBarLoadsNoAccess);
+    </script>
+  </body>
+</html>

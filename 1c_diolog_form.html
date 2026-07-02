@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=2, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+    <title>Списание 1С</title>
+  </head>
+  <body>
+    <div class="container">
+      <div>
+        <div class="grid-container" style="margin-top:10px">
+          <div class="input-group-prepend">
+            <label for="city" id="city_label">Город отгрузки:</label>
+          </div>
+          <div class="input-group-prepend">
+            <select id="sender_city_list" name="city_list">
+            </select>
+          </div>
+          <div class="input-group-prepend" style="margin-top:25px">
+            <label for="date" id="date_label">Дата отгрузки:</label>
+          </div>
+          <div class="input-group-prepend">
+            <select id="sender_date_list" name="date_list">
+            </select>
+          </div>
+
+        <button  class="btn btn-outline-primary" id="btn_add_spisanie" style="margin-top:25px">Добавить списание</button>
+        <div class="grid-container">
+          <label for="rows_count" id="rows_count" style="margin-top:25px">Кол-во строк:</label>
+          <div><label for="rows_count" id="missed_rows">Пропущенные строки:</label></div>
+        </div>
+      </div>
+    </div>   
+    <script>
+      function Form1CLoad(){
+        google.script.run.withSuccessHandler(Form1CLoadsWithData).returnLoadData();
+      }
+      function Form1CLoadsWithData(data) {
+        let s_city_list = data[0];
+        let s_date_list = data[1];
+        //добавление списка городов
+        let s_city_list_html = document.getElementById("sender_city_list");
+        s_city_list.forEach(itemText => {
+            const option = document.createElement('option');
+            option.value = String(itemText).toLowerCase(); // Set the value
+            option.textContent = String(itemText);         // Set the visible text
+            s_city_list_html.appendChild(option);     // Add the option to the select element
+        });
+
+        //добавление списка дат отгрузок
+        let s_date_list_html = document.getElementById("sender_date_list");
+        s_date_list.forEach(itemText => {
+            const option = document.createElement('option');
+            option.value = itemText.toLowerCase(); // Set the value
+            option.textContent = itemText;         // Set the visible text
+            s_date_list_html.appendChild(option);     // Add the option to the select element
+        });
+
+      }
+
+      function onButtonSpisanieClick(){
+        let s_date_html = document.getElementById("sender_date_list");
+        let s_city_html = document.getElementById("sender_city_list");
+        let s_date = s_date_html.value;
+        let s_city = s_city_html.value;
+        google.script.run.withSuccessHandler(show_stat_result).AddSpisanie(s_city, s_date);
+        function show_stat_result(res){
+          let label_result = document.getElementById("rows_count");
+          let label_result_missed = document.getElementById("missed_rows");
+          
+          label_result.textContent = "Кол-во строк: " + res[0].length;
+          label_result_missed.textContent = "Пропущенные строки: " + res[1].join(" ")
+        }
+      }
+
+      let btn_add_spisanie = document.getElementById("btn_add_spisanie");
+      btn_add_spisanie.addEventListener("click", onButtonSpisanieClick);            
+      document.addEventListener("DOMContentLoaded", Form1CLoad);
+    </script>
+  </body>
+</html>
