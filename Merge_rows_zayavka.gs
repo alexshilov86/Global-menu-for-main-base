@@ -11,13 +11,14 @@ function merge_rows_zayavka() {
     return 0;
   }
   
-  if ( ws.getName() !== "Заявки" && ws.getName() !== "Готовится к отгрузке"){
+  if ( ws.getName() !== "Заявки" && ws.getName() !== "Готовится к отгрузке" && ws.getName() !== "возвраты" ){
     Logger.log(ws.getName())
     return 0
   }
 
   for (let i = sel_range.getRow(); i<=sel_range.getLastRow();i++){
     tmpcity = ws.getRange(i, columns["gor_nazn_col"]).getValue().trim();
+    tmpcity = tmpcity + ws.getRange(i, columns["gor_otpr_col"]).getValue().trim();
     tmpcity = tmpcity + ws.getRange(i, columns["poluch_col"]).getValue().trim();
 
     if (!city_dict.hasOwnProperty(tmpcity)){

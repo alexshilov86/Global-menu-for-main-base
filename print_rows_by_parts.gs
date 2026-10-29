@@ -169,7 +169,13 @@ function Print_onpravlenie_info_by_parts() {
     }
     
   }
-    
+  let lastrow = ws_itog.getLastRow();
+  ws_itog.setRowHeights(4, lastrow, 50); //устанавливаем высоту строк
+  const maxRows = ws_itog.getMaxRows();
+  const allRowsRange = ws_itog.getRange(2, 1, maxRows-1, 1);
+  ws_itog.unhideRow(allRowsRange); //раскрыть скрытые строки    
+
+  
   ws_itog.activate();
 }
 

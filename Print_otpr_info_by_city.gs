@@ -30,6 +30,7 @@ function Print_onpravlenie_info_by_city() {
         for (let otpr_pr of tmp_json){
           otpr_pr["reciver_adr"] = ws.getRange(i, columns["adr_nazn_col"]).getValue();
           otpr_pr["reciver"] = ws.getRange(i, columns["poluch_col"]).getValue();
+          otpr_pr["otpr_city"] = ws.getRange(i, columns["gor_otpr_col"]).getValue();
         }
         tmp_arr.push (...tmp_json);
         let city_otpr_vol = ws.getRange(i, columns["gor_nazn_col"]).getValue() + ", " + ws.getRange(i, columns["adr_nazn_col"]).getValue() + ", " + ws.getRange(i, columns["poluch_col"]).getValue();
@@ -50,7 +51,7 @@ function Print_onpravlenie_info_by_city() {
   tmp_str = "[" + tmp_arr.join(", ") + "]";
   let package_json = tmp_arr;
   for (let otpr of package_json ){
-    let crit = otpr["reciver_city"] + ", " + otpr["reciver_adr"] + ", " + otpr["reciver"];
+    let crit = otpr["otpr_city"] + " - " + otpr["reciver_city"] + ", " + otpr["reciver_adr"] + ", " + otpr["reciver"];
     if (!city_dict.hasOwnProperty(crit )) {
       city_dict[crit] = otpr["all_cargos"];  
       

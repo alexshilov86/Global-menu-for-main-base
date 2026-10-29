@@ -1,8 +1,8 @@
 function onOpen() {
   var ui = SpreadsheetApp.getUi();
-  var ui2 = SpreadsheetApp.getUi();
+  // var ui2 = SpreadsheetApp.getUi();
 
-  ui2.createMenu('Global logistic') //общие команды
+  ui.createMenu('Global logistic') //общие команды
     // .addItem('Статус накладной', 'loadFormNakladnaya')
     .addItem('Объединить строки', 'merge_rows_zayavka')
     .addItem('Добавить номер отправления', 'add_index')
